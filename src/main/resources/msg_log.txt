@@ -1,0 +1,16 @@
+sent    : PASS oauth:s7ta3gkjb3062x6trkl9g8ygp8vgb4
+sent    : NICK lastzerg
+sent    : JOIN #tomatosyell
+received: :tmi.twitch.tv 001 lastzerg :Welcome, GLHF!
+received: :tmi.twitch.tv 002 lastzerg :Your host is tmi.twitch.tv
+received: :tmi.twitch.tv 003 lastzerg :This server is rather new
+received: :tmi.twitch.tv 004 lastzerg :-
+received: :tmi.twitch.tv 375 lastzerg :-
+received: :tmi.twitch.tv 372 lastzerg :You are in a maze of twisty passages, all alike.
+received: :tmi.twitch.tv 376 lastzerg :>
+received: :lastzerg!lastzerg@lastzerg.tmi.twitch.tv JOIN #tomatosyell
+received: :lastzerg.tmi.twitch.tv 353 lastzerg = #tomatosyell :lastzerg
+received: :lastzerg.tmi.twitch.tv 366 lastzerg #tomatosyell :End of /NAMES list
+received: :frenchassko!frenchassko@frenchassko.tmi.twitch.tv PRIVMSG #tomatosyell :Но ДЛС к думу никому в итоге нафиг не нужно
+received: :solomoncomeon!solomoncomeon@solomoncomeon.tmi.twitch.tv PRIVMSG #tomatosyell :@max1que вульф раньше тоже не за сюжет славился
+received: :j0shua_graham!j0shua_graham@j0shua_graham.tmi.twitch.tv PRIVMSG #tomatosyell :к думу дополнения все сетевые же

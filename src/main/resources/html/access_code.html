@@ -1,0 +1,23 @@
+<!DOCTYPE>
+<html>
+<body>
+    <div>
+        Access code successfully acquired. <br> Page will be closed in <span id="counter"></span> seconds.
+    </div>
+
+    <script type="text/javascript">
+        (function() {
+            var secondsLeft = 5;
+            document.querySelector("#counter").innerHTML = secondsLeft + '';
+            setInterval(function() {
+                if (secondsLeft > 0) {
+                    var counter = document.querySelector("#counter");
+                    counter.innerHTML = --secondsLeft + '';
+                } else {
+                    close();
+                }
+            }, 1000)
+        })();
+    </script>
+</body>
+</html>
