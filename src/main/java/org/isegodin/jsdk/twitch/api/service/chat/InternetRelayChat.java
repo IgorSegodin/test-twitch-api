@@ -51,21 +51,52 @@ public class InternetRelayChat {
         sender = new Sender(socket);
     }
 
+    public void stop() {
+        receiver.interrupt();
+        receiver = null;
+
+        waiter.stop();
+        waiter = null;
+
+        sender = null;
+
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            socket = null;
+        }
+
+    }
+
     public void sendCommand(String command) {
         sender.send(command);
+        //TODO proper logging
         System.out.println("sent    : " + command);
     }
 
     public void sendCommandAndWaitForResponse(String command, Predicate<String> predicate, long millis, String description) {
-        // TODO
+        __internalWaitForResponse__(() -> {
+            sendCommand(command);
+        }, predicate, millis, description);
     }
 
     public void waitForResponse(Predicate<String> predicate, long millis, String description) {
+        __internalWaitForResponse__(null, predicate, millis, description);
+    }
+
+    private void __internalWaitForResponse__(Callback callback, Predicate<String> predicate, long millis, String description) {
         Object monitor = new Object();
 
         WaitPredicate waitPredicate = new WaitPredicate(predicate, monitor);
 
         waiter.addWaitCondition(waitPredicate);
+
+        if (callback != null) {
+            callback.call();
+        }
 
         synchronized (monitor) {
             Stopwatch stopwatch = Stopwatch.start();
@@ -82,9 +113,14 @@ public class InternetRelayChat {
     }
 
     protected void onReceive(String command) {
+        //TODO proper logging
         System.out.println("received: " + command);
         waiter.checkPredicates(command);
         messageListener.accept(command);
+    }
+
+    private interface Callback {
+        void call();
     }
 
     private static class WaitPredicate {
@@ -108,13 +144,19 @@ public class InternetRelayChat {
 
     private static class Waiter {
 
+        private volatile boolean running = true;
+
         private final ConcurrentHashMap<Predicate<String>, WaitPredicate> predicateMap = new ConcurrentHashMap<>();
+
+        public void stop() {
+            running = false;
+        }
 
         public void checkPredicates(final String command) {
             Iterator<WaitPredicate> iterator = predicateMap.values().iterator();
 
             new Thread(() -> {
-                while (iterator.hasNext()) {
+                while (running && iterator.hasNext()) {
                     WaitPredicate next = iterator.next();
                     try {
                         if (next.getPredicate().test(command)) {
@@ -128,7 +170,7 @@ public class InternetRelayChat {
                     }
                 }
             })
-            .start();
+                    .start();
         }
 
         public void addWaitCondition(WaitPredicate predicate) {
