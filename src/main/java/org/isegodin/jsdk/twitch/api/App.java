@@ -32,13 +32,7 @@ public class App {
 
         TwitchChat chat = new TwitchChat("lastzerg", twitchApiService.getAccessToken());
 
-        chat.joinChannel("idmeety");
-
-//        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-//
-//        while (true) {
-//
-//        }
+        chat.joinChannel("channel");
     }
 
 }

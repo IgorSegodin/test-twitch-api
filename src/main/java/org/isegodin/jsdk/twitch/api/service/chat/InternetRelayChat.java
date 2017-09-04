@@ -68,7 +68,6 @@ public class InternetRelayChat {
             }
             socket = null;
         }
-
     }
 
     public void sendCommand(String command) {
@@ -123,6 +122,9 @@ public class InternetRelayChat {
         void call();
     }
 
+    /**
+     * Holds waiting condition and synchronization monitor.
+     */
     private static class WaitPredicate {
 
         private final Predicate<String> predicate;
@@ -142,6 +144,11 @@ public class InternetRelayChat {
         }
     }
 
+
+    /**
+     * Manages waiting conditions and callbacks.
+     *
+     */
     private static class Waiter {
 
         private volatile boolean running = true;
@@ -154,7 +161,7 @@ public class InternetRelayChat {
 
         public void checkPredicates(final String command) {
             Iterator<WaitPredicate> iterator = predicateMap.values().iterator();
-
+            // TODO probably need to change this with thread pool or with single thread and message queue
             new Thread(() -> {
                 while (running && iterator.hasNext()) {
                     WaitPredicate next = iterator.next();
@@ -182,6 +189,9 @@ public class InternetRelayChat {
         }
     }
 
+    /**
+     * Separate thread for receiving messages from socket input stream.
+     */
     private static class Receiver extends Thread {
 
         private final Consumer<String> consumer;
@@ -209,6 +219,9 @@ public class InternetRelayChat {
         }
     }
 
+    /**
+     * Wrap socket output stream, add line separator and flush after each command.
+     */
     private static class Sender {
 
         private final BufferedWriter writer;

@@ -1,0 +1,3 @@
+twitch.client-id=
+twitch.client-secret=
+twitch.redirect-url=http://localhost:55456
