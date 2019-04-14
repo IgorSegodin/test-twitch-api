@@ -1,5 +1,6 @@
 package org.isegodin.jsdk.twitch.api.service.chat;
 
+import lombok.extern.log4j.Log4j2;
 import org.isegodin.jsdk.twitch.api.util.Stopwatch;
 
 import java.io.BufferedReader;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 /**
  * @author isegodin
  */
+@Log4j2
 public class InternetRelayChat {
 
     private final String host;
@@ -64,7 +66,7 @@ public class InternetRelayChat {
             try {
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Socket close error", e);
             }
             socket = null;
         }
@@ -72,8 +74,7 @@ public class InternetRelayChat {
 
     public void sendCommand(String command) {
         sender.send(command);
-        //TODO proper logging
-        System.out.println("sent    : " + command);
+        log.info("Sent command: {}", command);
     }
 
     public void sendCommandAndWaitForResponse(String command, Predicate<String> predicate, long millis, String description) {
@@ -112,8 +113,7 @@ public class InternetRelayChat {
     }
 
     protected void onReceive(String command) {
-        //TODO proper logging
-        System.out.println("received: " + command);
+        log.info("Received: {}", command);
         waiter.checkPredicates(command);
         messageListener.accept(command);
     }
@@ -173,7 +173,7 @@ public class InternetRelayChat {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Waiter error", e);
                     }
                 }
             })

@@ -1,8 +1,8 @@
 package org.isegodin.jsdk.twitch.api;
 
+import lombok.extern.log4j.Log4j2;
 import org.isegodin.jsdk.twitch.api.core.TwitchConfig;
 import org.isegodin.jsdk.twitch.api.data.dict.Scope;
-import org.isegodin.jsdk.twitch.api.data.response.SubscriptionResponse;
 import org.isegodin.jsdk.twitch.api.service.TwitchApiService;
 import org.isegodin.jsdk.twitch.api.service.TwitchApiServiceImpl;
 import org.isegodin.jsdk.twitch.api.service.chat.TwitchChat;
@@ -14,6 +14,7 @@ import java.util.Properties;
 /**
  * @author isegodin
  */
+@Log4j2
 public class App {
 
     public static void main(String[] args) throws IOException {
@@ -28,11 +29,9 @@ public class App {
 
         TwitchApiService twitchApiService = new TwitchApiServiceImpl(config);
 
-        SubscriptionResponse subscriptions = twitchApiService.getSubscriptions();
-
         TwitchChat chat = new TwitchChat("lastzerg", twitchApiService.getAccessToken());
 
-        chat.joinChannel("channel");
+        chat.joinChannel("igorghk", new MarzGameChatEventListener("igorghk"));
     }
 
 }

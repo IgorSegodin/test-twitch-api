@@ -1,5 +1,6 @@
 package org.isegodin.jsdk.twitch.api.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class JsonService {
 
     {
         objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public <T> T fromJson(String jsonString, Class<T> type) {

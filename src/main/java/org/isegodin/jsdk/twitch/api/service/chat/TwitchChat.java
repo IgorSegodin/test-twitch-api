@@ -1,13 +1,17 @@
 package org.isegodin.jsdk.twitch.api.service.chat;
 
-import java.util.function.Consumer;
+import lombok.extern.log4j.Log4j2;
+import org.isegodin.jsdk.twitch.api.service.chat.event.TextMessage;
+
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author isegodin
  */
-public class TwitchChat {
+@Log4j2
+public class TwitchChat implements ChatApi {
 
     private static final long DEFAULT_TIMEOUT_MILLIS = 10_000;
 
@@ -25,6 +29,7 @@ public class TwitchChat {
     private final String userName;
 
     private volatile String joinedChannel;
+    private volatile ChatEventListener eventListener;
 
     public TwitchChat(String userName, String accessToken) {
         this.userName = userName;
@@ -39,7 +44,7 @@ public class TwitchChat {
         );
     }
 
-    public void joinChannel(String channel) {
+    public void joinChannel(String channel, ChatEventListener eventListener) {
         synchronized (monitor) {
             relayChat.sendCommandAndWaitForResponse(
                     "JOIN #" + channel,
@@ -48,27 +53,13 @@ public class TwitchChat {
                     "joining channel '" + channel + "'"
             );
             joinedChannel = channel;
+            this.eventListener = eventListener;
         }
     }
 
+    @Override
     public void sendMessage(String message) {
         relayChat.sendCommand("PRIVMSG #" + joinedChannel + " :" + message);
-    }
-
-    public void onMessageReceive(Consumer<Object> consumer) {
-        // TODO
-    }
-
-    public void onUserJoin(Consumer<Object> consumer) {
-        // TODO
-    }
-
-    public void onUserPart(Consumer<Object> consumer) {
-        // TODO
-    }
-
-    public void onSubscribe(Consumer<Object> consumer) {
-        // TODO
     }
 
     private void internalMessageListener(String message) {
@@ -78,11 +69,23 @@ public class TwitchChat {
             String pingArgument = pingMatcher.group("argument");
             relayChat.sendCommand("PONG " + pingArgument);
         } else {
-            // TODO proper handling (listeners)
-//            Matcher msgMatcher = MESSAGE_PATTERN.matcher(message);
-//            if (msgMatcher.matches()) {
-//                System.out.println(msgMatcher.group("name") + ": " + msgMatcher.group("message"));
-//            }
+            log.info("Message received: {}", message);
+            Matcher msgMatcher = MESSAGE_PATTERN.matcher(message);
+            if (!msgMatcher.matches() || !Objects.equals(joinedChannel, msgMatcher.group("channel"))) {
+                return;
+            }
+            if (this.eventListener != null) {
+                TextMessage textMessage = TextMessage.builder()
+                        .username(msgMatcher.group("name"))
+                        .message(msgMatcher.group("message"))
+                        .build();
+                try {
+                    this.eventListener.onTextMessageReceive(textMessage,
+                            this);
+                } catch (Exception e) {
+                    log.error("Listener error " + textMessage, e);
+                }
+            }
         }
     }
 }
